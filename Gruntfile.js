@@ -1,7 +1,9 @@
 /*global module:false require:false*/
 
 module.exports = function(grunt) {
-  var files = ["v1.js"];
+  var files = ["v1.js"]
+    , libAndTest  = files.slice(0);
+    libAndTest.push('test/src/**/*.coffee');
 
   grunt.initConfig({
     meta: {
@@ -35,9 +37,10 @@ module.exports = function(grunt) {
     //   }
     // },
 
+
     watch: {
       tests: {
-        files: ['test/src/**/*.coffee'],
+        files: libAndTest,
         tasks: ['coffee:tests', 'testOnly']
       },
       app: {
