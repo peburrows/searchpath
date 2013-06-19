@@ -1,0 +1,29 @@
+{
+  "name": "searchpath",
+  "version": "1.0.0",
+  "description": "Fast, simple search for your site",
+  "main": "v1.js",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/manton/searchpath.git"
+  },
+  "author": "Manton Reece",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "bugs": {
+    "url": "https://github.com/manton/searchpath/issues"
+  },
+
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-watch": "*",
+    "grunt-contrib-jshint": "*",
+    "grunt-contrib-concat": "*",
+    "grunt-contrib-uglify": "~0.2.0",
+    "grunt-contrib-coffee": "*",
+    "grunt-contrib-jasmine": "*"
+  }
+}
