@@ -7,7 +7,7 @@ buildUrl = (data) ->
 
 addScript = (url) ->
   script = document.createElement('script')
-  script.type = 'text/javascript'
+  script.type = 'text/test' # setting this to 'text/test' so it doesn't actually get pulled in
   script.src  = url
   document.head.appendChild(script)
 
