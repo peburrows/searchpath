@@ -15,15 +15,15 @@ module.exports = function(grunt) {
       files: ['Gruntfile.js', 'v1.js']
     },
 
-    // coffee: {
-    //   tests: {
-    //     expand: true,
-    //     cwd: 'test/src/',
-    //     src: '**/*.coffee',
-    //     dest: 'test/lib/',
-    //     ext: '.js'
-    //   }
-    // },
+    coffee: {
+      tests: {
+        expand: true,
+        cwd: 'test/src/',
+        src: '**/*.coffee',
+        dest: 'test/lib/',
+        ext: '.js'
+      }
+    },
 
     // concat: {
     //   options: {
@@ -35,25 +35,24 @@ module.exports = function(grunt) {
     //   }
     // },
 
-    // watch: {
-    //   tests: {
-    //     files: ['test/src/**/*.coffee'],
-    //     tasks: ['coffee:tests', 'testOnly']
-    //   },
-    //   app: {
-    //     files: '<%= concat.dist.src %>',
-    //     tasks: ['default']
-    //   }
-    // },
+    watch: {
+      tests: {
+        files: ['test/src/**/*.coffee'],
+        tasks: ['coffee:tests', 'testOnly']
+      },
+      app: {
+        files: files,
+        tasks: ['default']
+      }
+    },
 
-    // jasmine: {
-    //   options: {
-    //     specs: 'test/lib/**/*.js',
-    //     helpers: ['test/helpers/jasmine-jquery.js'],
-    //     template: 'test/template.tmpl'
-    //   },
-    //   src: ['lib/build/searchpath.js']
-    // },
+    jasmine: {
+      options: {
+        specs: 'test/lib/**/*.js',
+        template: 'test/template.tmpl'
+      },
+      src: files
+    },
 
     jshint: {
       options: {
@@ -99,8 +98,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-jshint');
 
-  // grunt.registerTask('test', ['concat', 'coffee:tests', 'jasmine']);
-  // grunt.registerTask('testOnly', ['concat', 'jasmine']);
+  grunt.registerTask('test', ['coffee:tests', 'jasmine']);
+  grunt.registerTask('testOnly', ['jasmine']);
 
   // Default task.
   grunt.registerTask('default', ['uglify']);
