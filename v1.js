@@ -64,11 +64,10 @@
 		return (/iPhone/i).test(navigator.userAgent);
 	};
 
+	// pass in the jQuery we want to use
 	var initSearchpath = function($){
 		Searchpath.go = function ()
 		{
-			var $ = Searchpath.$;
-
 			if ($("#searchpath_pane").length === 0) {
 				$("<div>").attr("id", "searchpath_arrow").appendTo("body");
 				$("<div>").attr("id", "searchpath_pane").appendTo("body");
@@ -76,8 +75,8 @@
 
 				$(document).keyup(function(e) {
 					if (e.which == 27) {
-						searchpath_close();
-						searchpath_restoreScroll();
+						Searchpath.close();
+						restoreScroll();
 						return false;
 					}
 				});
@@ -92,8 +91,8 @@
 			var x, y;
 
 			if (q.length === 0) {
-				searchpath_close();
-				searchpath_restoreScroll();
+				Searchpath.close();
+				restoreScroll();
 				return false;
 			}
 
@@ -144,8 +143,8 @@
 				height: $(document).height() + "px"
 			});
 
-			searchpath_showWithOpacity(backdrop, 0.7);
-			searchpath_showWithOpacity(copy_pane, 1.0);
+			showWithOpacity(backdrop, 0.7);
+			showWithOpacity(copy_pane, 1.0);
 
 			if (copy_pane.scrollTop() > 0) {
 				copy_pane.animate({scrollTop:0});
@@ -183,17 +182,16 @@
 				});
 			}
 
-			searchpath_showWithOpacity(copy_arrow, 1.0);
+			showWithOpacity(copy_arrow, 1.0);
 
 			backdrop.unbind("click");
 			backdrop.click(function() {
-				searchpath_close();
-				searchpath_restoreScroll();
+				Searchpath.close();
+				restoreScroll();
 				return false;
 			});
 
-			searchpath_preventScroll();
-			prlkj();
+			preventScroll();
 			$.get('http://js.searchpath.io/html?site=' + encodeURIComponent(Searchpath.getSite()) + '&q=' + encodeURIComponent(q), function(response_data) {
 				copy_pane.html(response_data);
 			});
@@ -205,9 +203,9 @@
 		{
 			var search_box = document.getElementById(Searchpath.getFieldId());
 			var q = search_box.value;
-			var body_tag = searchpath_j('body');
+			var body_tag = $('body');
 
-			Searchpath.$.get('http://js.searchpath.io/html?site=' + encodeURIComponent(Searchpath.getSite()) + '&q=' + encodeURIComponent(q), function(response_data) {
+			$.get('http://js.searchpath.io/html?site=' + encodeURIComponent(Searchpath.getSite()) + '&q=' + encodeURIComponent(q), function(response_data) {
 				body_tag.html(response_data);
 				body_tag.append('<input type="hidden" id="' + Searchpath.getFieldId() + '" value="' + encodeURIComponent(q) + '" />');
 
@@ -219,9 +217,8 @@
 			return false;
 		}
 
-		function searchpath_showMore()
+		Searchpath.showMore = function()
 		{
-			var $ = Searchpath.$;
 			var search_box = document.getElementById(Searchpath.getFieldId());
 			var q = search_box.value;
 			$.get('http://js.searchpath.io/html?site=' + encodeURIComponent(Searchpath.getSite()) + '&q=' + encodeURIComponent(q) + '&from=10&size=50', function(response_data) {
@@ -229,52 +226,48 @@
 			});
 		}
 
-		function searchpath_close()
+		Searchpath.close = function()
 		{
-			var searchpath_j = document.searchpath_jQuery;
-
 			if (Searchpath.isMobile()) {
 				window.location.reload();
 			}
 			else {
-				searchpath_hideWithOpacity(searchpath_j("#searchpath_pane"));
-				searchpath_hideWithOpacity(searchpath_j("#searchpath_arrow"));
-				searchpath_hideWithOpacity(searchpath_j("#searchpath_backdrop"));
+				hideWithOpacity($("#searchpath_pane"));
+				hideWithOpacity($("#searchpath_arrow"));
+				hideWithOpacity($("#searchpath_backdrop"));
 
 				setTimeout(function() {
-					searchpath_j("#searchpath_pane").hide();
-					searchpath_j("#searchpath_arrow").hide();
-					searchpath_j("#searchpath_backdrop").hide();
+					$("#searchpath_pane").hide();
+					$("#searchpath_arrow").hide();
+					$("#searchpath_backdrop").hide();
 				}, 1000);
 			}
-		}
+		};
 
-		function searchpath_preventScroll()
+		var preventScroll = function()
 		{
 			if (navigator.userAgent.match(/WebKit/i) !== null) {
-				var searchpath_j = document.searchpath_jQuery;
-				searchpath_j("body").css("overflow", "hidden");
+				$("body").css("overflow", "hidden");
 			}
-		}
+		};
 
-		function searchpath_restoreScroll()
+		var restoreScroll = function()
 		{
 			if (navigator.userAgent.match(/WebKit/i) !== null) {
-				var searchpath_j = document.searchpath_jQuery;
-				searchpath_j("body").css("overflow", "scroll");
+				$("body").css("overflow", "scroll");
 			}
-		}
+		};
 
-		function searchpath_showWithOpacity(inElement, inOpacity)
+		var showWithOpacity = function(inElement, inOpacity)
 		{
 			inElement.show();
 			inElement.css("opacity", inOpacity);
-		}
+		};
 
-		function searchpath_hideWithOpacity(inElement)
+		var hideWithOpacity = function(inElement)
 		{
 			inElement.css("opacity", 0);
-		}
+		};
 
 		$(document).trigger('searchpath:init');
 	}; // initSearchpath()
@@ -283,10 +276,10 @@
 	script.src = "http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js";
 	script.type = "text/javascript";
 	script.onload = function() {
-		document.searchpath_jQuery = Searchpath.$ = jQuery.noConflict(true);
 		// really, what we should do here, is call everything to initialize all the Searchpath stuff,
 		// because none of this will work anyway until jQuery is loaded...
-		initSearchpath.call(window, Searchpath.$);
+		var local$ = jQuery.noConflict(true);
+		initSearchpath.call(window, local$);
 	};
 
 	var css_link = document.createElement("link");
@@ -301,6 +294,10 @@
 		document.write('<form class="form-search"><input type="search" name="q" id="searchpath_q" class="input-medium search-query" placeholder="' + Searchpath.getParam("placeholder") + '" /></form>');
 	}
 
+
+	// we should change these handlers to check to see if Searchpath is fully loaded
+	// if it *is* fully loaded, we call the handler
+	// if not, we show "loading..." and call the handler once it's finished
 	if (Searchpath.isMobile()) {
 		document.getElementById(Searchpath.getFieldId()).form.onsubmit = searchpath_mobile;
 	}
