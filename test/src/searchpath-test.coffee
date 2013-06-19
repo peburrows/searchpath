@@ -25,7 +25,7 @@ describe 'Searchpath', ->
       addScript(scriptUrl)
 
       describe 'getScriptURL()', ->
-        it 'should return the proper', ->
+        it 'should return the proper value', ->
           expect(Searchpath.getScriptURL()).toEqual(scriptUrl)
 
       describe 'getSite()', ->

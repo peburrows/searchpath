@@ -14,7 +14,7 @@
 		}
 
 		return js_url;
-	}
+	};
 
 	Searchpath.getParam = function (inName, defaultValue)
 	{
@@ -35,17 +35,17 @@
 		}
 
 		return defaultValue;
-	}
+	};
 
 	Searchpath.getFieldId = function ()
 	{
 		return Searchpath.getParam('id', 'searchpath_q');
-	}
+	};
 
 	Searchpath.getTheme = function ()
 	{
 		return Searchpath.getParam('theme', 'default');
-	}
+	};
 
 	Searchpath.getSite = function ()
 	{
@@ -57,230 +57,236 @@
 			site = pieces[pieces.length-1];
 		}
 		return site;
-	}
+	};
 
-	function searchpath_go()
+	Searchpath.isMobile = function()
 	{
-		var searchpath_j = document.searchpath_jQuery;
+		return (/iPhone/i).test(navigator.userAgent);
+	};
 
-		if (searchpath_j("#searchpath_pane").length === 0) {
-			searchpath_j("<div>").attr("id", "searchpath_arrow").appendTo("body");
-			searchpath_j("<div>").attr("id", "searchpath_pane").appendTo("body");
-			searchpath_j("<div>").attr("id", "searchpath_backdrop").appendTo("body");
+	var initSearchpath = function($){
+		Searchpath.go = function ()
+		{
+			var $ = Searchpath.$;
 
-			searchpath_j(document).keyup(function(e) {
-				if (e.which == 27) {
-					searchpath_close();
-					searchpath_restoreScroll();
-					return false;
+			if ($("#searchpath_pane").length === 0) {
+				$("<div>").attr("id", "searchpath_arrow").appendTo("body");
+				$("<div>").attr("id", "searchpath_pane").appendTo("body");
+				$("<div>").attr("id", "searchpath_backdrop").appendTo("body");
+
+				$(document).keyup(function(e) {
+					if (e.which == 27) {
+						searchpath_close();
+						searchpath_restoreScroll();
+						return false;
+					}
+				});
+			}
+
+			var search_box = document.getElementById(Searchpath.getFieldId());
+			var q = search_box.value;
+			var link = $(search_box);
+			var copy_pane = $('#searchpath_pane');
+			var copy_arrow = $('#searchpath_arrow');
+			var backdrop = $('#searchpath_backdrop');
+			var x, y;
+
+			if (q.length === 0) {
+				searchpath_close();
+				searchpath_restoreScroll();
+				return false;
+			}
+
+			var page_column_size = $(document).width() / 5;
+			var position_mid = link.offset().left + (link.width() / 2);
+			var direction;
+			if ((position_mid > (page_column_size * 2)) && (position_mid < (page_column_size * 3))) {
+				x = (page_column_size * 2) + (page_column_size / 2) - (copy_pane.width() / 2);
+				if (link.offset().top < 500) {
+					direction = "up";
+					y = link.offset().top + link.height() + 20;
 				}
-			});
-		}
-
-		var search_box = document.getElementById(Searchpath.getFieldId());
-		var q = search_box.value;
-		var link = searchpath_j(search_box);
-		var copy_pane = searchpath_j('#searchpath_pane');
-		var copy_arrow = searchpath_j('#searchpath_arrow');
-		var backdrop = searchpath_j('#searchpath_backdrop');
-		var x, y;
-
-		if (q.length === 0) {
-			searchpath_close();
-			searchpath_restoreScroll();
-			return false;
-		}
-
-		var page_column_size = searchpath_j(document).width() / 5;
-		var position_mid = link.offset().left + (link.width() / 2);
-		var direction;
-		if ((position_mid > (page_column_size * 2)) && (position_mid < (page_column_size * 3))) {
-			x = (page_column_size * 2) + (page_column_size / 2) - (copy_pane.width() / 2);
-			if (link.offset().top < 500) {
-				direction = "up";
-				y = link.offset().top + link.height() + 20;
+				else {
+					direction = "down";
+					y = link.offset().top - copy_pane.height() - 20;
+				}
+			}
+			else if (link.offset().left > 400) {
+				x = link.offset().left - copy_pane.width() - 20;
+				y = link.offset().top - (copy_pane.height() / 2) + parseInt(link.css("padding-top"),10);
+				direction = "right";
 			}
 			else {
-				direction = "down";
-				y = link.offset().top - copy_pane.height() - 20;
+				x = link.offset().left + link.width() + parseInt(link.css("padding-left"),10) + parseInt(link.css("padding-right"),10) + 20;
+				y = link.offset().top - (copy_pane.height() / 2) + parseInt(link.css("padding-top"),10);
+				direction = "left";
 			}
-		}
-		else if (link.offset().left > 400) {
-			x = link.offset().left - copy_pane.width() - 20;
-			y = link.offset().top - (copy_pane.height() / 2) + parseInt(link.css("padding-top"),10);
-			direction = "right";
-		}
-		else {
-			x = link.offset().left + link.width() + parseInt(link.css("padding-left"),10) + parseInt(link.css("padding-right"),10) + 20;
-			y = link.offset().top - (copy_pane.height() / 2) + parseInt(link.css("padding-top"),10);
-			direction = "left";
-		}
 
-		var scroll_y = searchpath_j(document).scrollTop();
-		if ((y - scroll_y) < 10) {
-			y = scroll_y + 10;
-		}
-		else {
-			var scroll_bottom = scroll_y + searchpath_j(window).height();
-			if ((y + copy_pane.height()) > scroll_bottom) {
-				y = scroll_bottom - copy_pane.height() - 10;
+			var scroll_y = $(document).scrollTop();
+			if ((y - scroll_y) < 10) {
+				y = scroll_y + 10;
 			}
-		}
+			else {
+				var scroll_bottom = scroll_y + $(window).height();
+				if ((y + copy_pane.height()) > scroll_bottom) {
+					y = scroll_bottom - copy_pane.height() - 10;
+				}
+			}
 
-		copy_pane.css({
-			top: y + "px",
-			left: x + "px",
-			"box-shadow": "1px 1px 2px gray"
-		});
-
-		backdrop.css({
-			width: searchpath_j(document).width() + "px",
-			height: searchpath_j(document).height() + "px"
-		});
-
-		searchpath_showWithOpacity(backdrop, 0.7);
-		searchpath_showWithOpacity(copy_pane, 1.0);
-
-		if (copy_pane.scrollTop() > 0) {
-			copy_pane.animate({scrollTop:0});
-		}
-
-		if (direction == "up") {
-			copy_arrow.css("background-image", "url(http://js.searchpath.io/themes/" + Searchpath.getTheme() + "/popover_arrow_up.png)");
-			copy_arrow.css({
-				width: "30px",
-				height: "16px",
-				top: y - 15 + "px",
-				left: link.offset().left + (link.width() / 2) - 10 + "px"
+			copy_pane.css({
+				top: y + "px",
+				left: x + "px",
+				"box-shadow": "1px 1px 2px gray"
 			});
-		}
-		else if (direction == "down") {
-			copy_arrow.css("background-image", "url(http://js.searchpath.io/themes/" + Searchpath.getTheme() + "/popover_arrow_down.png)");
-			copy_arrow.css({
-				width: "30px",
-				height: "16px",
-				top: y + copy_pane.height() + "px",
-				left: link.offset().left + (link.width() / 2) - 10 + "px"
-			});
-		}
-		else if (direction == "right") {
-			copy_arrow.css("background-image", "url(http://js.searchpath.io/themes/" + Searchpath.getTheme() + "/popover_arrow_right.png)");
-			copy_arrow.css({
-				top: link.offset().top - 4 + "px",
-				left: copy_pane.offset().left + copy_pane.width() + 1 + "px"
-			});
-		}
-		else if (direction == "left") {
-			copy_arrow.css({
-				top: link.offset().top - 4 + "px",
-				left: copy_pane.offset().left - copy_arrow.width() + 1 + "px"
-			});
-		}
 
-		searchpath_showWithOpacity(copy_arrow, 1.0);
+			backdrop.css({
+				width: $(document).width() + "px",
+				height: $(document).height() + "px"
+			});
 
-		backdrop.unbind("click");
-		backdrop.click(function() {
-			searchpath_close();
-			searchpath_restoreScroll();
+			searchpath_showWithOpacity(backdrop, 0.7);
+			searchpath_showWithOpacity(copy_pane, 1.0);
+
+			if (copy_pane.scrollTop() > 0) {
+				copy_pane.animate({scrollTop:0});
+			}
+
+			if (direction == "up") {
+				copy_arrow.css("background-image", "url(http://js.searchpath.io/themes/" + Searchpath.getTheme() + "/popover_arrow_up.png)");
+				copy_arrow.css({
+					width: "30px",
+					height: "16px",
+					top: y - 15 + "px",
+					left: link.offset().left + (link.width() / 2) - 10 + "px"
+				});
+			}
+			else if (direction == "down") {
+				copy_arrow.css("background-image", "url(http://js.searchpath.io/themes/" + Searchpath.getTheme() + "/popover_arrow_down.png)");
+				copy_arrow.css({
+					width: "30px",
+					height: "16px",
+					top: y + copy_pane.height() + "px",
+					left: link.offset().left + (link.width() / 2) - 10 + "px"
+				});
+			}
+			else if (direction == "right") {
+				copy_arrow.css("background-image", "url(http://js.searchpath.io/themes/" + Searchpath.getTheme() + "/popover_arrow_right.png)");
+				copy_arrow.css({
+					top: link.offset().top - 4 + "px",
+					left: copy_pane.offset().left + copy_pane.width() + 1 + "px"
+				});
+			}
+			else if (direction == "left") {
+				copy_arrow.css({
+					top: link.offset().top - 4 + "px",
+					left: copy_pane.offset().left - copy_arrow.width() + 1 + "px"
+				});
+			}
+
+			searchpath_showWithOpacity(copy_arrow, 1.0);
+
+			backdrop.unbind("click");
+			backdrop.click(function() {
+				searchpath_close();
+				searchpath_restoreScroll();
+				return false;
+			});
+
+			searchpath_preventScroll();
+			prlkj();
+			$.get('http://js.searchpath.io/html?site=' + encodeURIComponent(Searchpath.getSite()) + '&q=' + encodeURIComponent(q), function(response_data) {
+				copy_pane.html(response_data);
+			});
+
 			return false;
-		});
+		}
 
-		searchpath_preventScroll();
+		function searchpath_mobile()
+		{
+			var search_box = document.getElementById(Searchpath.getFieldId());
+			var q = search_box.value;
+			var body_tag = searchpath_j('body');
 
-		searchpath_j.get('http://js.searchpath.io/html?site=' + encodeURIComponent(Searchpath.getSite()) + '&q=' + encodeURIComponent(q), function(response_data) {
-			copy_pane.html(response_data);
-		});
+			Searchpath.$.get('http://js.searchpath.io/html?site=' + encodeURIComponent(Searchpath.getSite()) + '&q=' + encodeURIComponent(q), function(response_data) {
+				body_tag.html(response_data);
+				body_tag.append('<input type="hidden" id="' + Searchpath.getFieldId() + '" value="' + encodeURIComponent(q) + '" />');
 
-		return false;
-	}
+				if (body_tag.scrollTop() > 0) {
+					body_tag.animate({scrollTop:0});
+				}
+			});
 
-	function searchpath_mobile()
-	{
-		var searchpath_j = document.searchpath_jQuery;
-		var search_box = document.getElementById(Searchpath.getFieldId());
-		var q = search_box.value;
-		var body_tag = searchpath_j('body');
+			return false;
+		}
 
-		searchpath_j.get('http://js.searchpath.io/html?site=' + encodeURIComponent(Searchpath.getSite()) + '&q=' + encodeURIComponent(q), function(response_data) {
-			body_tag.html(response_data);
-			body_tag.append('<input type="hidden" id="' + Searchpath.getFieldId() + '" value="' + encodeURIComponent(q) + '" />');
+		function searchpath_showMore()
+		{
+			var $ = Searchpath.$;
+			var search_box = document.getElementById(Searchpath.getFieldId());
+			var q = search_box.value;
+			$.get('http://js.searchpath.io/html?site=' + encodeURIComponent(Searchpath.getSite()) + '&q=' + encodeURIComponent(q) + '&from=10&size=50', function(response_data) {
+				$("#searchpath_more").html(response_data);
+			});
+		}
 
-			if (body_tag.scrollTop() > 0) {
-				body_tag.animate({scrollTop:0});
+		function searchpath_close()
+		{
+			var searchpath_j = document.searchpath_jQuery;
+
+			if (Searchpath.isMobile()) {
+				window.location.reload();
 			}
-		});
+			else {
+				searchpath_hideWithOpacity(searchpath_j("#searchpath_pane"));
+				searchpath_hideWithOpacity(searchpath_j("#searchpath_arrow"));
+				searchpath_hideWithOpacity(searchpath_j("#searchpath_backdrop"));
 
-		return false;
-	}
-
-	function searchpath_showMore()
-	{
-		var searchpath_j = document.searchpath_jQuery;
-		var search_box = document.getElementById(Searchpath.getFieldId());
-		var q = search_box.value;
-		searchpath_j.get('http://js.searchpath.io/html?site=' + encodeURIComponent(Searchpath.getSite()) + '&q=' + encodeURIComponent(q) + '&from=10&size=50', function(response_data) {
-			searchpath_j("#searchpath_more").html(response_data);
-		});
-	}
-
-	function searchpath_close()
-	{
-		var searchpath_j = document.searchpath_jQuery;
-
-		if (searchpath_isMobile()) {
-			window.location.reload();
+				setTimeout(function() {
+					searchpath_j("#searchpath_pane").hide();
+					searchpath_j("#searchpath_arrow").hide();
+					searchpath_j("#searchpath_backdrop").hide();
+				}, 1000);
+			}
 		}
-		else {
-			searchpath_hideWithOpacity(searchpath_j("#searchpath_pane"));
-			searchpath_hideWithOpacity(searchpath_j("#searchpath_arrow"));
-			searchpath_hideWithOpacity(searchpath_j("#searchpath_backdrop"));
 
-			setTimeout(function() {
-				searchpath_j("#searchpath_pane").hide();
-				searchpath_j("#searchpath_arrow").hide();
-				searchpath_j("#searchpath_backdrop").hide();
-			}, 1000);
+		function searchpath_preventScroll()
+		{
+			if (navigator.userAgent.match(/WebKit/i) !== null) {
+				var searchpath_j = document.searchpath_jQuery;
+				searchpath_j("body").css("overflow", "hidden");
+			}
 		}
-	}
 
-	function searchpath_preventScroll()
-	{
-		if (navigator.userAgent.match(/WebKit/i) !== null) {
-			var searchpath_j = document.searchpath_jQuery;
-			searchpath_j("body").css("overflow", "hidden");
+		function searchpath_restoreScroll()
+		{
+			if (navigator.userAgent.match(/WebKit/i) !== null) {
+				var searchpath_j = document.searchpath_jQuery;
+				searchpath_j("body").css("overflow", "scroll");
+			}
 		}
-	}
 
-	function searchpath_restoreScroll()
-	{
-		if (navigator.userAgent.match(/WebKit/i) !== null) {
-			var searchpath_j = document.searchpath_jQuery;
-			searchpath_j("body").css("overflow", "scroll");
+		function searchpath_showWithOpacity(inElement, inOpacity)
+		{
+			inElement.show();
+			inElement.css("opacity", inOpacity);
 		}
-	}
 
-	function searchpath_showWithOpacity(inElement, inOpacity)
-	{
-		inElement.show();
-		inElement.css("opacity", inOpacity);
-	}
+		function searchpath_hideWithOpacity(inElement)
+		{
+			inElement.css("opacity", 0);
+		}
 
-	function searchpath_hideWithOpacity(inElement)
-	{
-		inElement.css("opacity", 0);
-	}
-
-	function searchpath_isMobile()
-	{
-		return (navigator.userAgent.match(/iPhone/i) !== null);
-	}
+		$(document).trigger('searchpath:init');
+	}; // initSearchpath()
 
 	var script = document.createElement("script");
 	script.src = "http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js";
 	script.type = "text/javascript";
 	script.onload = function() {
-		document.searchpath_jQuery = jQuery.noConflict(true);
+		document.searchpath_jQuery = Searchpath.$ = jQuery.noConflict(true);
+		// really, what we should do here, is call everything to initialize all the Searchpath stuff,
+		// because none of this will work anyway until jQuery is loaded...
+		initSearchpath.call(window, Searchpath.$);
 	};
 
 	var css_link = document.createElement("link");
@@ -295,11 +301,11 @@
 		document.write('<form class="form-search"><input type="search" name="q" id="searchpath_q" class="input-medium search-query" placeholder="' + Searchpath.getParam("placeholder") + '" /></form>');
 	}
 
-	if (searchpath_isMobile()) {
+	if (Searchpath.isMobile()) {
 		document.getElementById(Searchpath.getFieldId()).form.onsubmit = searchpath_mobile;
 	}
 	else {
-		document.getElementById(Searchpath.getFieldId()).form.onsubmit = searchpath_go;
+		document.getElementById(Searchpath.getFieldId()).form.onsubmit = Searchpath.go;
 	}
 
 	this.Searchpath = Searchpath;
