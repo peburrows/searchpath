@@ -52,6 +52,7 @@ module.exports = function(grunt) {
     jasmine: {
       options: {
         specs: 'test/lib/**/*.js',
+        helpers: ['test/helpers/jasmine-jquery.js'],
         template: 'test/template.tmpl'
       },
       src: files
