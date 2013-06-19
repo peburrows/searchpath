@@ -24,25 +24,25 @@ describe 'Searchpath', ->
       scriptUrl = buildUrl(defaultConfig)
       addScript(scriptUrl)
 
-      describe 'searchpath_getScriptURL()', ->
+      describe 'getScriptURL()', ->
         it 'should return the proper', ->
-          expect(searchpath_getScriptURL()).toEqual(scriptUrl)
+          expect(Searchpath.getScriptURL()).toEqual(scriptUrl)
 
-      describe 'searchpath_getSite()', ->
+      describe 'getSite()', ->
         it 'should extract the site URL properly', ->
-          expect(searchpath_getSite()).toEqual(defaultConfig.site)
+          expect(Searchpath.getSite()).toEqual(defaultConfig.site)
 
-      describe 'searchpath_getParam()', ->
+      describe 'getParam()', ->
         it 'should properly extract params', ->
-          expect(searchpath_getParam('placeholder')).toEqual(defaultConfig.query.placeholder)
+          expect(Searchpath.getParam('placeholder')).toEqual(defaultConfig.query.placeholder)
         it 'should return a blank string when attempting to extract a non-existent param', ->
-          expect(searchpath_getParam('nonsense')).toEqual('')
+          expect(Searchpath.getParam('nonsense')).toEqual('')
 
-      describe 'searchpath_getFieldId()', ->
+      describe 'getFieldId()', ->
         it 'should return the default if not specified', ->
-          expect(searchpath_getFieldId()).toEqual('searchpath_q')
+          expect(Searchpath.getFieldId()).toEqual('searchpath_q')
 
-      describe 'searchpath_getTheme()', ->
+      describe 'getTheme()', ->
         it 'should return the default if not specified', ->
-          expect(searchpath_getTheme()).toEqual('default')
+          expect(Searchpath.getTheme()).toEqual('default')
 
