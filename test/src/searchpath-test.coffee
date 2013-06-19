@@ -37,6 +37,9 @@ describe 'Searchpath', ->
           expect(Searchpath.getParam('placeholder')).toEqual(defaultConfig.query.placeholder)
         it 'should return a blank string when attempting to extract a non-existent param', ->
           expect(Searchpath.getParam('nonsense')).toEqual('')
+        it 'should return a specified default value when attempting to extract a non-existent param', ->
+          expect(Searchpath.getParam('nothing', 'myDefault')).toEqual('myDefault')
+          expect(Searchpath.getParam('my-null', null)).toEqual(null)
 
       describe 'getFieldId()', ->
         it 'should return the default if not specified', ->

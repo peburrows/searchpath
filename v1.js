@@ -1,7 +1,8 @@
 (function(){
+	// I wonder how much we actually need to expose to the outside world...
 	var Searchpath = {};
 
-	Searchpath.getScriptURL = searchpath_getScriptURL = function()
+	Searchpath.getScriptURL = function()
 	{
 		var js_url = "";
 		var tags = document.getElementsByTagName("script");
@@ -15,9 +16,11 @@
 		return js_url;
 	}
 
-	Searchpath.getParam = searchpath_getParam = function (inName)
+	Searchpath.getParam = function (inName, defaultValue)
 	{
-		var js_url = searchpath_getScriptURL();
+		if(typeof defaultValue === 'undefined') defaultValue = "";
+
+		var js_url = Searchpath.getScriptURL();
 		var s = js_url.split("?")[1];
 		if (s !== undefined) {
 			var params = s.split("&");
@@ -31,31 +34,23 @@
 			}
 		}
 
-		return "";
+		return defaultValue;
 	}
 
-	Searchpath.getFieldId = searchpath_getFieldId = function ()
+	Searchpath.getFieldId = function ()
 	{
-		var field_id = searchpath_getParam("id");
-		if (field_id === "") {
-			field_id = "searchpath_q";
-		}
-		return field_id;
+		return Searchpath.getParam('id', 'searchpath_q');
 	}
 
-	Searchpath.getTheme = searchpath_getTheme = function ()
+	Searchpath.getTheme = function ()
 	{
-		var theme = searchpath_getParam("theme");
-		if (theme === "") {
-			theme = "default";
-		}
-		return theme;
+		return Searchpath.getParam('theme', 'default');
 	}
 
-	Searchpath.getSite = searchpath_getSite = function ()
+	Searchpath.getSite = function ()
 	{
 		var site = document.location.hostname;
-		var js_url = searchpath_getScriptURL();
+		var js_url = Searchpath.getScriptURL();
 		if (js_url !== "") {
 			var s = js_url.split("?")[0];
 			var pieces = s.split("/");
@@ -82,7 +77,7 @@
 			});
 		}
 
-		var search_box = document.getElementById(searchpath_getFieldId());
+		var search_box = document.getElementById(Searchpath.getFieldId());
 		var q = search_box.value;
 		var link = searchpath_j(search_box);
 		var copy_pane = searchpath_j('#searchpath_pane');
@@ -151,7 +146,7 @@
 		}
 
 		if (direction == "up") {
-			copy_arrow.css("background-image", "url(http://js.searchpath.io/themes/" + searchpath_getTheme() + "/popover_arrow_up.png)");
+			copy_arrow.css("background-image", "url(http://js.searchpath.io/themes/" + Searchpath.getTheme() + "/popover_arrow_up.png)");
 			copy_arrow.css({
 				width: "30px",
 				height: "16px",
@@ -160,7 +155,7 @@
 			});
 		}
 		else if (direction == "down") {
-			copy_arrow.css("background-image", "url(http://js.searchpath.io/themes/" + searchpath_getTheme() + "/popover_arrow_down.png)");
+			copy_arrow.css("background-image", "url(http://js.searchpath.io/themes/" + Searchpath.getTheme() + "/popover_arrow_down.png)");
 			copy_arrow.css({
 				width: "30px",
 				height: "16px",
@@ -169,7 +164,7 @@
 			});
 		}
 		else if (direction == "right") {
-			copy_arrow.css("background-image", "url(http://js.searchpath.io/themes/" + searchpath_getTheme() + "/popover_arrow_right.png)");
+			copy_arrow.css("background-image", "url(http://js.searchpath.io/themes/" + Searchpath.getTheme() + "/popover_arrow_right.png)");
 			copy_arrow.css({
 				top: link.offset().top - 4 + "px",
 				left: copy_pane.offset().left + copy_pane.width() + 1 + "px"
@@ -193,7 +188,7 @@
 
 		searchpath_preventScroll();
 
-		searchpath_j.get('http://js.searchpath.io/html?site=' + encodeURIComponent(searchpath_getSite()) + '&q=' + encodeURIComponent(q), function(response_data) {
+		searchpath_j.get('http://js.searchpath.io/html?site=' + encodeURIComponent(Searchpath.getSite()) + '&q=' + encodeURIComponent(q), function(response_data) {
 			copy_pane.html(response_data);
 		});
 
@@ -203,13 +198,13 @@
 	function searchpath_mobile()
 	{
 		var searchpath_j = document.searchpath_jQuery;
-		var search_box = document.getElementById(searchpath_getFieldId());
+		var search_box = document.getElementById(Searchpath.getFieldId());
 		var q = search_box.value;
 		var body_tag = searchpath_j('body');
 
-		searchpath_j.get('http://js.searchpath.io/html?site=' + encodeURIComponent(searchpath_getSite()) + '&q=' + encodeURIComponent(q), function(response_data) {
+		searchpath_j.get('http://js.searchpath.io/html?site=' + encodeURIComponent(Searchpath.getSite()) + '&q=' + encodeURIComponent(q), function(response_data) {
 			body_tag.html(response_data);
-			body_tag.append('<input type="hidden" id="' + searchpath_getFieldId() + '" value="' + encodeURIComponent(q) + '" />');
+			body_tag.append('<input type="hidden" id="' + Searchpath.getFieldId() + '" value="' + encodeURIComponent(q) + '" />');
 
 			if (body_tag.scrollTop() > 0) {
 				body_tag.animate({scrollTop:0});
@@ -222,9 +217,9 @@
 	function searchpath_showMore()
 	{
 		var searchpath_j = document.searchpath_jQuery;
-		var search_box = document.getElementById(searchpath_getFieldId());
+		var search_box = document.getElementById(Searchpath.getFieldId());
 		var q = search_box.value;
-		searchpath_j.get('http://js.searchpath.io/html?site=' + encodeURIComponent(searchpath_getSite()) + '&q=' + encodeURIComponent(q) + '&from=10&size=50', function(response_data) {
+		searchpath_j.get('http://js.searchpath.io/html?site=' + encodeURIComponent(Searchpath.getSite()) + '&q=' + encodeURIComponent(q) + '&from=10&size=50', function(response_data) {
 			searchpath_j("#searchpath_more").html(response_data);
 		});
 	}
@@ -290,21 +285,21 @@
 
 	var css_link = document.createElement("link");
 	css_link.rel = "stylesheet";
-	css_link.href = "http://js.searchpath.io/themes/" + searchpath_getTheme() + "/main.css";
+	css_link.href = "http://js.searchpath.io/themes/" + Searchpath.getTheme() + "/main.css";
 	css_link.type = "text/css";
 
 	document.getElementsByTagName('head')[0].appendChild(script);
 	document.getElementsByTagName('head')[0].appendChild(css_link);
 
-	if (searchpath_getParam("id") === "") {
-		document.write('<form class="form-search"><input type="search" name="q" id="searchpath_q" class="input-medium search-query" placeholder="' + searchpath_getParam("placeholder") + '" /></form>');
+	if (Searchpath.getParam("id") === "") {
+		document.write('<form class="form-search"><input type="search" name="q" id="searchpath_q" class="input-medium search-query" placeholder="' + Searchpath.getParam("placeholder") + '" /></form>');
 	}
 
 	if (searchpath_isMobile()) {
-		document.getElementById(searchpath_getFieldId()).form.onsubmit = searchpath_mobile;
+		document.getElementById(Searchpath.getFieldId()).form.onsubmit = searchpath_mobile;
 	}
 	else {
-		document.getElementById(searchpath_getFieldId()).form.onsubmit = searchpath_go;
+		document.getElementById(Searchpath.getFieldId()).form.onsubmit = searchpath_go;
 	}
 
 	this.Searchpath = Searchpath;
