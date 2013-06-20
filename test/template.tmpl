@@ -9,14 +9,14 @@
   <% }) %>
 
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+</head>
+
+<body>
 
   <% with (scripts) { %>
     <% [].concat(jasmine, vendor, helpers, src, specs, reporters, start).forEach(function(script){ %>
       <script type="text/javascript" src="<%= script %>"></script>
     <% }); %>
   <% }; %>
-</head>
-
-<body>
 </body>
 </html>
