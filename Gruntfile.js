@@ -1,7 +1,7 @@
 /*global module:false require:false*/
 
 module.exports = function(grunt) {
-  var files = ["v1.js"]
+  var files = ["lib/v2.js"]
     , libAndTest  = files.slice(0);
     libAndTest.push('test/src/**/*.coffee');
 
@@ -10,11 +10,12 @@ module.exports = function(grunt) {
       pkg: grunt.file.readJSON('package.json'),
       banner: '/*! searchpath.js - v<%= meta.pkg.version %> - ' +
         '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
+        'Copyright (c) 2013 Riverfold Software (http://www.riverfold.com/)\n' +
         '<%= meta.pkg.author %> */\n' +
         '<%= meta.pkg.license %> License\n'
     },
     lint: {
-      files: ['Gruntfile.js', 'v1.js']
+      files: ['Gruntfile.js', 'lib/v2.js']
     },
 
     coffee: {
@@ -74,12 +75,13 @@ module.exports = function(grunt) {
         browser: true,
         jquery: true,
         loopfunc: true,
-        evil: true
+        evil: true,
+        globals: {
+          'Searchpath': false,
+          'console': false
+        }
       },
-      globals: {
-        'Searchpath': false,
-        'console': false
-      }
+      src: files
     },
 
     uglify: {
@@ -88,7 +90,8 @@ module.exports = function(grunt) {
       },
       dist: {
         files: {
-          'v1.min.js': 'v1.js'
+          'v1.min.js': 'v1.js',
+          'v2.min.js': 'lib/v2.js'
         }
       }
     }
