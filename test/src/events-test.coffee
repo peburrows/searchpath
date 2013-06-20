@@ -29,6 +29,20 @@ describe 'Searchpath Events', ->
         @searchPath.on(@eventName, handlers.func)
         expect(handlers.func).toHaveBeenCalledWith(@eventData)
 
+    describe 'when registering an event handler to be called once', ->
+      beforeEach ->
+        @onceHandlers = func: ()->
+        spyOn(@onceHandlers, 'func')
+        @eventName = 'only:once'
+
+      it 'should only call it once', ->
+        @searchPath.once(@eventName, @onceHandlers.func)
+        @searchPath.trigger(@eventName)
+        @searchPath.trigger(@eventName)
+        expect(@onceHandlers.func).toHaveBeenCalled()
+        expect(@onceHandlers.func.callCount).toBe(1)
+
+
     describe 'when triggering events on the "class"', ->
       it 'should call the handlers on all instances', ->
         handlers = func: ()->
