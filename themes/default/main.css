@@ -61,13 +61,25 @@
 	-webkit-transition: opacity 0.5s;
 }
 
-
 #searchpath_arrow.visible {
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
   filter: alpha(opacity=100);
   -moz-opacity: 1.0;
   -khtml-opacity: 1.0;
   opacity: 1.0;
+}
+
+#searchpath_arrow.up {
+	background-image: url(popover_arrow_up.png);
+}
+#searchpath_arrow.down {
+	background-image: url(popover_arrow_down.png);
+}
+#searchpath_arrow.right {
+	background-image: url(popover_arrow_right.png);
+}
+#searchpath_arrow.left {
+	background-image: url(popover_arrow_left.png);
 }
 
 .searchpath_inside {
